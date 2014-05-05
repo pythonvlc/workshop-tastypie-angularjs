@@ -23,11 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 from django.db import models
+from characters import CHARACTER_ATTRIBUTES
 
 
 class Race(models.Model):
     """
-
+    Race model. A race modifies characters values.
     """
     name = models.CharField(max_length=200)
     strength_modifier = models.IntegerField()
@@ -38,15 +39,40 @@ class Race(models.Model):
         return self.name
 
 
-class Character(models.Model):
+class Skill(models.Model):
+    """
+    Skill model. An action a character can do.
     """
 
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    attribute = models.CharField(choices=CHARACTER_ATTRIBUTES, max_length=16)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Profession(models.Model):
+    """
+    Class model. Give skills to characters
+    """
+    name = models.CharField(max_length=200)
+    skills = models.ManyToManyField(Skill)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Character(models.Model):
+    """
+    Character model.
     """
     name = models.CharField(max_length=200)
     base_strength = models.IntegerField()
     base_dexterity = models.IntegerField()
     base_intelligence = models.IntegerField()
     race = models.ForeignKey(Race)
+    profession = models.ForeignKey(Profession)
 
     def __unicode__(self):
         return self.name

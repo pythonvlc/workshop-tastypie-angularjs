@@ -28,7 +28,7 @@ from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource
-from characters.models import Character, Race
+from characters.models import Character, Race, Profession, Skill
 
 
 class RaceResource(ModelResource):
@@ -42,9 +42,34 @@ class RaceResource(ModelResource):
         always_return_data = True
 
 
+class SkillResource(ModelResource):
+
+    class Meta:
+        object_class = Skill
+        queryset = Skill.objects.all()
+        resource_name = "skills"
+        authorization = Authorization()
+        authentication = Authentication()
+        always_return_data = True
+
+
+class ProfessionResource(ModelResource):
+
+    skills = fields.ToManyField(SkillResource, attribute='skills', full=True, null=True)
+
+    class Meta:
+        object_class = Profession
+        queryset = Profession.objects.all()
+        resource_name = "professions"
+        authorization = Authorization()
+        authentication = Authentication()
+        always_return_data = True
+
+
 class CharacterResource(ModelResource):
 
-    race = fields.ToOneField(RaceResource, attribute='race')
+    race = fields.ToOneField(RaceResource, attribute='race', full=True, null=True)
+    profession = fields.ToOneField(ProfessionResource, attribute='race', full=True, null=True)
 
     class Meta:
         object_class = Character

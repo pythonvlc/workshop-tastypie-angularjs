@@ -22,29 +22,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.test import TestCase
+from core.dices import d20
 
-from django.contrib import admin
-from tastypie.api import Api
-from characters.api.resources import CharacterResource, RaceResource, ProfessionResource, SkillResource
 
-admin.autodiscover()
+class DicesTests(TestCase):
 
-api_v1 = Api(api_name='v1')
-api_v1.register(CharacterResource())
-api_v1.register(RaceResource())
-api_v1.register(ProfessionResource())
-api_v1.register(SkillResource())
-
-urlpatterns = patterns(
-    '',
-    url(r'^api/', include(api_v1.urls)),
-    url(r'^admin/', include(admin.site.urls)),
-)
-
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns += patterns('',
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    )
+    def test_d20(self):
+        for _ in range(0, 100):
+            r = d20()
+            self.assertTrue(r <= 20)
+            self.assertTrue(r >= 1)
