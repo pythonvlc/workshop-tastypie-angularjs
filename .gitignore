@@ -1,0 +1,11 @@
+*.py[co]
+build
+*.db
+*.log
+*.idea
+*~
+*.swp
+*.swo
+.DS_Store
+._*
+
