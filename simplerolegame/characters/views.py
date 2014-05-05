@@ -22,12 +22,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-from __future__ import unicode_literals, absolute_import
-import random
-
-
-def d20():
-    """
-    Returns uniform random value between 1 and 20.
-    """
-    return random.randint(1, 20)

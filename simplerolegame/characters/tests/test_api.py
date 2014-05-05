@@ -75,3 +75,17 @@ class CharactersApiTests(ResourceTestCase):
             format='json',
         )
         self.assertValidJSONResponse(response)
+
+    def test_get_skill_probe(self):
+        skill = mommy.make('characters.Skill')
+        character = mommy.make('characters.Character')
+        data = {
+            "character": character.pk,
+            "difficulty": 12
+        }
+        response = self.api_client.get(
+            '/api/v1/skills/{}/probes/'.format(skill.pk),
+            data=data,
+            format='json',
+        )
+        self.assertValidJSONResponse(response)

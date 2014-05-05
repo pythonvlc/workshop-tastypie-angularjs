@@ -23,11 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 from __future__ import unicode_literals, absolute_import
-from tastypie import fields
+import json
 
+from django.conf.urls import url
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.http import HttpResponse
+from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
+from tastypie.http import HttpNotFound, HttpMultipleChoices
 from tastypie.resources import ModelResource
+from tastypie.utils import trailing_slash
+
 from characters.models import Character, Race, Profession, Skill
 
 
@@ -48,9 +55,40 @@ class SkillResource(ModelResource):
         object_class = Skill
         queryset = Skill.objects.all()
         resource_name = "skills"
+        probes_allowed_methods = ['get']
         authorization = Authorization()
         authentication = Authentication()
         always_return_data = True
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<%s>.+)/probes%s$" % (
+                    self._meta.resource_name, self._meta.detail_uri_name, trailing_slash()
+                ),
+                self.wrap_view('dispatch_probes'),
+                name="api_dispatch_probes"
+            ),
+        ]
+
+    def dispatch_probes(self, request, **kwargs):
+        return self.dispatch('probes', request, **kwargs)
+
+    def get_probes(self, request, **kwargs):
+        basic_bundle = self.build_bundle(request=request)
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return HttpNotFound()
+        except MultipleObjectsReturned:
+            return HttpMultipleChoices("More than one resource is found at this URI.")
+        try:
+            character = Character.objects.get(pk=request.GET.get('character'))
+        except Character.DoesNotExist:
+            return HttpNotFound()
+        result = obj.probe(character, request.GET.get('difficulty'))
+        response = {"result": result}
+        return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 class ProfessionResource(ModelResource):

@@ -22,8 +22,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+from __future__ import unicode_literals, absolute_import
 from django.db import models
 from characters import CHARACTER_ATTRIBUTES
+from core.dices import d20
+from core.modifiers import modifier_value
 
 
 class Race(models.Model):
@@ -50,6 +53,15 @@ class Skill(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def probe(self, character, difficulty):
+        """
+        Character try to use a skill.
+        """
+        attribute = getattr(character, self.attribute)
+        dice_roll = d20()
+        total_result = attribute() + dice_roll
+        return total_result >= difficulty
 
 
 class Profession(models.Model):
@@ -78,10 +90,10 @@ class Character(models.Model):
         return self.name
 
     def strength(self):
-        return self.base_strength + self.race.strength_modifier
+        return modifier_value(self.base_strength + self.race.strength_modifier)
 
     def dexterity(self):
-        return self.base_dexterity + self.race.dexterity_modifier
+        return modifier_value(self.base_dexterity + self.race.dexterity_modifier)
 
     def intelligence(self):
-        return self.base_dexterity + self.race.dexterity_modifier
+        return modifier_value(self.base_dexterity + self.race.dexterity_modifier)
