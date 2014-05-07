@@ -8,4 +8,4 @@ build
 *.swo
 .DS_Store
 ._*
-
+sc_env
