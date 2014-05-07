@@ -47,6 +47,22 @@ class CharactersApiTests(ResourceTestCase):
         characters = json.loads(response.content)
         self.assertEquals(characters['meta']['total_count'], Race.objects.count())
 
+    def test_post_races(self):
+        prev = Race.objects.count()
+        data = {
+            "name": "human",
+            "strength_modifier": 1,
+            "dexterity_modifier": 1,
+            "intelligence_modifier": 0,
+        }
+        response = self.api_client.post(
+            '/api/v1/races/',
+            format='json',
+            data=data
+        )
+        self.assertHttpCreated(response)
+        self.assertEquals(prev + 1, Race.objects.count())
+
     def test_get_race_details(self):
         race = mommy.make('characters.Race')
         response = self.api_client.get(
