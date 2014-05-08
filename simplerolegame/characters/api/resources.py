@@ -55,12 +55,13 @@ class SkillResource(ModelResource):
         object_class = Skill
         queryset = Skill.objects.all()
         resource_name = "skills"
-        probes_allowed_methods = ['get']
+        details_allowed_methods = ['get']
         authorization = Authorization()
         authentication = Authentication()
         always_return_data = True
 
     def prepend_urls(self):
+        # GET /api/v1/skills/1/probes/
         return [
             url(
                 r"^(?P<resource_name>%s)/(?P<%s>.+)/probes%s$" % (
@@ -122,3 +123,7 @@ class CharacterResource(ModelResource):
         bundle.data['dexterity'] = bundle.obj.dexterity()
         bundle.data['intelligence'] = bundle.obj.intelligence()
         return bundle
+
+
+
+
